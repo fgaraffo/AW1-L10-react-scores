@@ -1,34 +1,49 @@
-import { Table } from "react-bootstrap";
+import { Form, Table, Button } from "react-bootstrap";
 import { useState } from "react";
 import { iconDelete, iconEdit } from './icons';
+import dayjs from 'dayjs';
 
 function ExamTable(props) {
-    const [exams, setExams] = useState(props.exams);
+    const [exams, setExams] = useState([...props.exams]);
+    const [showForm, setShowForm] = useState(false);
 
     const deleteExams = (coursecode) => {
         setExams((exs) => exs.filter((ex) => ex.coursecode !== coursecode));
     };
 
-    return (<Table striped bordered hover>
-        <thead>
-            <tr>
-                <th>Exam</th>
-                <th>Score</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {
-            exams.map((ex) =>
-                <ExamRow exam={ex}
-                examName={props.courses.filter( (c) => c.coursecode === ex.coursecode )[0].name}
-                deleteExam={deleteExams}
-                key={ex.coursecode}>
-                </ExamRow>
-            )}
-            </tbody>
-    </Table>
+    const addExam = (exam) => {
+        setExams((oldExams) => [...oldExams, exam]);
+        //setExams((oldExams) => oldExams.concat(exam));
+    };
+
+    return (
+        <>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Exam</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        exams.map((ex) =>
+                            <ExamRow exam={ex}
+                                examName={props.courses.filter((c) => c.coursecode === ex.coursecode)[0].name}
+                                deleteExam={deleteExams}
+                                key={ex.coursecode}>
+                            </ExamRow>
+                        )}
+                </tbody>
+            </Table>
+            {showForm ?
+                <ExamForm courses={props.courses}
+                    addExam={(exam) => { addExam(exam); setShowForm(false); }}
+                    cancel={() => setShowForm(false)} /> :
+                <Button variant='success' onClick={() => setShowForm(true)}>Add</Button>}
+        </>
     );
 };
 
@@ -57,6 +72,40 @@ function RowControl(props) {
             {iconEdit} / <span onClick={() => props.deleteExam(props.exam.coursecode)}>{iconDelete}</span>
         </td>
     );
-}
+};
+
+function ExamForm(props) {
+    const [course, setCourse] = useState('');
+    const [score, setScore] = useState(30);
+    const [date, setDate] = useState(dayjs());
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const exam = { coursecode: course, score: score, date: date };
+        props.addExam(exam);
+    }
+
+    return (
+        <Form>
+            <Form.Group controlId='selectedCourse'>
+                <Form.Label>Course</Form.Label>
+                <Form.Control as='select' defaultValue='' value={course} onChange={(ev) => setCourse(ev.target.value)}>
+                    <option hidden disabled value=''>choose...</option>
+                    {props.courses.map(c => <option key={c.coursecode} value={c.coursecode}>{c.name}</option>)}
+                </Form.Control>
+            </Form.Group>
+            <Form.Group controlId='selectedScore'>
+                <Form.Label>Score</Form.Label>
+                <Form.Control type='number' min={18} max={31} value={score} onChange={(ev) => setScore(ev.target.value)}></Form.Control>
+            </Form.Group>
+            <Form.Group controlId='selectedDate'>
+                <Form.Label>Date</Form.Label>
+                <Form.Control type='date' value={date.format('YYYY-MM-DD')} onChange={ev => setDate(dayjs(ev.target.value))} />
+            </Form.Group>
+            <Button onClick={handleSubmit}>Save</Button>
+            <Button variant='secondary' onClick={props.cancel}>Cancel</Button>
+        </Form>
+    );
+};
 
 export default ExamTable;

@@ -6,18 +6,19 @@ import { Container, Row, Col } from 'react-bootstrap';
 import ExamTable from './ExamComponents'
 
 import { fakeCourses, fakeExams } from './FakeData';
+import AppTitle from './AppTitle';
 
 function App() {
   return (
-    <Container className='App'>     
+    <Container className='App'>
       <Row>
-      <Col>
-        <h1>Your Exams</h1>
-        </Col>
+        <AppTitle />
       </Row>
       <Row>
-       <ExamTable exams={fakeExams} courses={fakeCourses}></ExamTable>
-      </Row>      
+        <Col>
+          <ExamTable exams={fakeExams} courses={fakeCourses} />
+        </Col>
+      </Row>
     </Container>
   );
 }
