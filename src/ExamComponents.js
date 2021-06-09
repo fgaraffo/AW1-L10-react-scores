@@ -109,3 +109,31 @@ function ExamForm(props) {
 };
 
 export default ExamTable;
+
+/* ALTERNATIVE IMPLEMENTATION, WITH "NATIVE" HTML CONTROLS (WITHOUT BOOTSTRAP) */
+/*
+function ExamForm_native(props) {
+    const [course, setCourse] = useState('');
+    const [score, setScore] = useState(30);
+    const [date, setDate] = useState(dayjs());
+  
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const exam = { coursecode: course, score: score, date: date };
+        props.addExam(exam);
+    };
+  
+    return (
+        <form>
+            <span style={{ display: 'inline-block', width: '5em' }}>Course:</span>
+            <select value={course} onChange={ev => setCourse(ev.target.value)}>
+                {props.courses.map(course => <option key={course.coursecode} value={course.coursecode}>{course.name}</option>)}
+            </select><br />
+            <span style={{ display: 'inline-block', width: '5em' }}>Score:</span>
+            <input type='number' min={18} max={31} value={score} onChange={ev => setScore(ev.target.value)} /><br />
+            <span style={{ display: 'inline-block', width: '5em' }}>Date:</span>
+            <input type='date' value={date.format('YYYY-MM-DD')} onChange={ev => setDate(dayjs(ev.target.value))} /><br />
+            <button onClick={handleSubmit}>Save</button> <button onClick={props.cancel}>Cancel</button>
+        </form >
+    )
+*/
