@@ -52,10 +52,10 @@ function ExamTable(props) {
 function ExamRow(props) {
     return (
         <tr>
-            <ExamRowData examName={props.examName} exam={props.exam}/>
+            <ExamRowData examName={props.examName} exam={props.exam} />
             {/* ---------- CONTEXT PRIMO METODO, Consumer + callback ---------- */}
-            <EditMode.Consumer>{editable => editable ? 
-                <RowControl deleteExam={props.deleteExam} exam={props.exam}/> : 
+            <EditMode.Consumer>{editable => editable ?
+                <RowControl deleteExam={props.deleteExam} exam={props.exam} /> :
                 <td><i>disabled</i></td>}
             </EditMode.Consumer>
         </tr>);
@@ -65,11 +65,11 @@ function ExamRowData(props) {
     /* ---------- CONTEXT SECONDO METODO, useContext ---------- */
     let privacyMode = useContext(PrivacyMode);
     return (
-            <>
-                <td>{props.examName}</td>
-                <td>{privacyMode ? 'X' : props.exam.score}</td>
-                <td>{privacyMode ? 'X' : props.exam.date.format('DD/MM/YYYY')}</td>
-            </> );
+        <>
+            <td>{props.examName}</td>
+            <td>{privacyMode ? 'X' : props.exam.score}</td>
+            <td>{privacyMode ? 'X' : props.exam.date.format('DD/MM/YYYY')}</td>
+        </>);
 };
 
 function RowControl(props) {
@@ -84,16 +84,16 @@ function ExamForm(props) {
     const [course, setCourse] = useState('');
     const [score, setScore] = useState(30);
     const [date, setDate] = useState(dayjs());
-
-    const handleSubmit = (event) => {
+    
+    const handleSubmit = (event) => {       
         event.preventDefault();
         const exam = { coursecode: course, score: score, date: date };
         props.addExam(exam);
-    }
+   };
 
     return (
-        <Form>
-            <Form.Group controlId='selectedCourse'>
+        <Form onSubmit={handleSubmit}>
+            <Form.Group controlId='selectedCourse' hasValidation>
                 <Form.Label>Course</Form.Label>
                 <Form.Control as='select' defaultValue='' value={course} onChange={(ev) => setCourse(ev.target.value)}>
                     <option hidden disabled value=''>choose...</option>
@@ -102,11 +102,11 @@ function ExamForm(props) {
             </Form.Group>
             <Form.Group controlId='selectedScore'>
                 <Form.Label>Score</Form.Label>
-                <Form.Control type='number' min={18} max={31} value={score} onChange={(ev) => setScore(ev.target.value)}></Form.Control>
+                <Form.Control type='number' min={18} max={31} value={score} onChange={(ev) => setScore(ev.target.value)}/>
             </Form.Group>
             <Form.Group controlId='selectedDate'>
                 <Form.Label>Date</Form.Label>
-                <Form.Control type='date' value={date.format('YYYY-MM-DD')} onChange={ev => setDate(dayjs(ev.target.value))} />
+                <Form.Control type='date' value={date.format('YYYY-MM-DD')} onChange={ev => setDate(dayjs(ev.target.value))}/>
             </Form.Group>
             <Button onClick={handleSubmit}>Save</Button>
             <Button variant='secondary' onClick={props.cancel}>Cancel</Button>
