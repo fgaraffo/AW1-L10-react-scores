@@ -1,22 +1,37 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Button } from 'react-bootstrap';
 
 //import dayjs from 'dayjs';
 import ExamTable from './ExamComponents'
 
 import { fakeCourses, fakeExams } from './FakeData';
 import AppTitle from './AppTitle';
+import { useState } from 'react';
+
+import { PrivacyMode, EditMode } from './createContexts';
 
 function App() {
+
+  const [privacy, setPrivacy] = useState(false);
+  const [editable, setEditable] = useState(true);
+
   return (
     <Container className='App'>
       <Row>
         <AppTitle />
+        <Col align='right'>
+          <Button variant='secondary' onClick={ () => setPrivacy( p => !p )}>{privacy ? 'View' : 'Hide'}</Button>
+          <Button variant='secondary' onClick={ () => setEditable( e => !e )}>{editable ? 'Read' : 'Edit'}</Button>
+        </Col>
       </Row>
       <Row>
         <Col>
-          <ExamTable exams={fakeExams} courses={fakeCourses} />
+          <PrivacyMode.Provider value={privacy}>
+            <EditMode.Provider value={editable}>
+              <ExamTable exams={fakeExams} courses={fakeCourses} />
+            </EditMode.Provider>
+          </PrivacyMode.Provider>
         </Col>
       </Row>
     </Container>

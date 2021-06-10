@@ -1,7 +1,9 @@
 import { Form, Table, Button } from "react-bootstrap";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { iconDelete, iconEdit } from './icons';
 import dayjs from 'dayjs';
+
+import { PrivacyMode, EditMode } from './createContexts';
 
 function ExamTable(props) {
     const [exams, setExams] = useState([...props.exams]);
@@ -50,21 +52,25 @@ function ExamTable(props) {
 function ExamRow(props) {
     return (
         <tr>
-            <ExamRowData examName={props.examName} exam={props.exam}></ExamRowData>
-            <RowControl deleteExam={props.deleteExam} exam={props.exam}></RowControl>
-        </tr>
-    );
+            <ExamRowData examName={props.examName} exam={props.exam}/>
+            {/* ---------- CONTEXT PRIMO METODO, Consumer + callback ---------- */}
+            <EditMode.Consumer>{editable => editable ? 
+                <RowControl deleteExam={props.deleteExam} exam={props.exam}/> : 
+                <td><i>disabled</i></td>}
+            </EditMode.Consumer>
+        </tr>);
 };
 
 function ExamRowData(props) {
+    /* ---------- CONTEXT SECONDO METODO, useContext ---------- */
+    let privacyMode = useContext(PrivacyMode);
     return (
-        <>
-            <td>{props.examName}</td>
-            <td>{props.exam.score}</td>
-            <td>{props.exam.date.format('DD/MM/YYYY')}</td>
-        </>
-    );
-}
+            <>
+                <td>{props.examName}</td>
+                <td>{privacyMode ? 'X' : props.exam.score}</td>
+                <td>{privacyMode ? 'X' : props.exam.date.format('DD/MM/YYYY')}</td>
+            </> );
+};
 
 function RowControl(props) {
     return (
@@ -116,13 +122,13 @@ function ExamForm_native(props) {
     const [course, setCourse] = useState('');
     const [score, setScore] = useState(30);
     const [date, setDate] = useState(dayjs());
-  
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const exam = { coursecode: course, score: score, date: date };
         props.addExam(exam);
     };
-  
+
     return (
         <form>
             <span style={{ display: 'inline-block', width: '5em' }}>Course:</span>
