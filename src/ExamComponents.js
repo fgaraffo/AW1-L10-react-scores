@@ -1,11 +1,11 @@
-import { Form, Table, Button } from "react-bootstrap";
+import { Form, Table, Button, Alert } from "react-bootstrap";
 import { useState, useContext } from "react";
 import { iconDelete, iconEdit } from './icons';
 import dayjs from 'dayjs';
 
 import { PrivacyMode, EditMode } from './createContexts';
 
-function ExamTable(props) {
+function ExamTable(props) { 
     const [exams, setExams] = useState([...props.exams]);
     const [showForm, setShowForm] = useState(false);
 
@@ -16,6 +16,13 @@ function ExamTable(props) {
     const addExam = (exam) => {
         setExams((oldExams) => [...oldExams, exam]);
         //setExams((oldExams) => oldExams.concat(exam));
+    };
+
+    const checkExam = (course) => {
+        if (exams.filter( ex => ex.coursecode === course).length === 0)
+            return true;
+        else
+            return false;
     };
 
     return (
@@ -41,7 +48,7 @@ function ExamTable(props) {
                 </tbody>
             </Table>
             {showForm ?
-                <ExamForm courses={props.courses}
+                <ExamForm checkExam={ (course) => checkExam(course) } courses={props.courses}
                     addExam={(exam) => { addExam(exam); setShowForm(false); }}
                     cancel={() => setShowForm(false)} /> :
                 <Button variant='success' onClick={() => setShowForm(true)}>Add</Button>}
@@ -82,27 +89,53 @@ function RowControl(props) {
 
 function ExamForm(props) {
     const [course, setCourse] = useState('');
-    const [score, setScore] = useState(30);
+    const [score, setScore] = useState(18);
     const [date, setDate] = useState(dayjs());
+    const [error, setError] = useState(''); //false
+ //   const [validated, setValidated] = useState(false);
     
     const handleSubmit = (event) => {       
         event.preventDefault();
+        //FORM VALIDATION
+        if ( course !== '' && props.checkExam(course) && score<=31 && score>=18){
         const exam = { coursecode: course, score: score, date: date };
         props.addExam(exam);
+        // setValidated(true);
+        } 
+        else if (course === '') {setError('Scegliere un corso dalla lista.');}
+        else if (!props.checkExam(course)) {setError(`Il corso ${course} è già presente.`);}
+        else if (score>=31 || score<=18) {setError(`Voto ${score} non valido. Inserire un voto compreso tra 18 e 31.`);}
+       // setValidated(true);
    };
 
+  // noValidate validated={validated} 
+
     return (
+        <>
+        {error ? <Alert variant="danger" onClose={() => setError(false)} dismissible>{error}</Alert> : false }
         <Form onSubmit={handleSubmit}>
-            <Form.Group controlId='selectedCourse' hasValidation>
+            <Form.Group controlId='selectedCourse'>
                 <Form.Label>Course</Form.Label>
-                <Form.Control as='select' defaultValue='' value={course} onChange={(ev) => setCourse(ev.target.value)}>
+                <Form.Control as='select' value={course} onChange={(ev) => setCourse(ev.target.value)}
+                 isValid={ course !== '' && props.checkExam(course)} 
+                 isInvalid={ !props.checkExam(course)}
+                  required>
                     <option hidden disabled value=''>choose...</option>
                     {props.courses.map(c => <option key={c.coursecode} value={c.coursecode}>{c.name}</option>)}
                 </Form.Control>
+                <Form.Control.Feedback type="invalid">
+              Il corso è già presente nella lista.
+            </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group controlId='selectedScore'>
+            <Form.Group controlId='selectedScore' >
                 <Form.Label>Score</Form.Label>
-                <Form.Control type='number' min={18} max={31} value={score} onChange={(ev) => setScore(ev.target.value)}/>
+                <Form.Control type='number' min={18} max={31} value={score} onChange={(ev) => setScore(ev.target.value)}
+                isValid={score<=31 && score>=18} 
+                isInvalid={score>31 || score<18}
+                 required/>
+                <Form.Control.Feedback type="invalid">
+              Il voto deve essere compreso tra 18 e 30.
+            </Form.Control.Feedback>
             </Form.Group>
             <Form.Group controlId='selectedDate'>
                 <Form.Label>Date</Form.Label>
@@ -111,6 +144,7 @@ function ExamForm(props) {
             <Button onClick={handleSubmit}>Save</Button>
             <Button variant='secondary' onClick={props.cancel}>Cancel</Button>
         </Form>
+        </>
     );
 };
 
