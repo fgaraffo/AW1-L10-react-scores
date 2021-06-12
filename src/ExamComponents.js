@@ -69,9 +69,9 @@ function RowControl(props) {
 
 function ExamForm(props) {
     const location = useLocation();
-    const [course, setCourse] = useState('');
-    const [score, setScore] = useState(18);
-    const [date, setDate] = useState(dayjs());
+    const [course, setCourse] = useState(location.state ? location.state.exam.coursecode : '');
+    const [score, setScore] = useState(location.state ? location.state.exam.score : 30);
+    const [date, setDate] = useState(location.state ? location.state.examDate : dayjs().format('YYYY-MM-DD'));
     const [error, setError] = useState(''); //false
     const [submitted, setSubmitted] = useState(false);
     //   const [validated, setValidated] = useState(false);
@@ -102,7 +102,7 @@ function ExamForm(props) {
                     <Form.Label>Course</Form.Label>
                     <Form.Control as='select' value={course} onChange={(ev) => setCourse(ev.target.value)}
                         isValid={course !== '' && props.checkExam(course)}
-                        isInvalid={!props.checkExam(course)} disabled={location.state}
+                        disabled={location.state}
                         required>
                         <option hidden disabled value=''>choose...</option>
                         {props.courses.map(c => <option key={c.coursecode} value={c.coursecode}>{c.name}</option>)}
