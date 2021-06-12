@@ -9,7 +9,7 @@ import { PrivacyMode, EditMode } from './createContexts';
 function ExamTable(props) {
 
     return (
-        <>
+        <>       
             <Table striped bordered hover>
                 <thead>
                     <tr>

@@ -46,32 +46,39 @@ function App() {
 
   return (
     <Router>
-      <Container className='App'>
-        <Row>
-          <AppTitle />
-          <Col align='right'>
-            <Button variant='secondary' onClick={() => setPrivacy(p => !p)}>{privacy ? 'View' : 'Hide'}</Button>
-            <Button variant='secondary' onClick={() => setEditable(e => !e)}>{editable ? 'Read' : 'Edit'}</Button>
-          </Col>
-        </Row>
+      <Container className='App'>       
         <Switch>
-        <Route path="/add" render={() => 
+        <Route path="/add" render={() => <>
+        <Row>
+        <AppTitle />
+        </Row>
          <ExamForm courses={fakeCourses.filter(course => !examCodes.includes(course.coursecode))} 
                   addOrUpdateExam={addExam} 
-                  checkExam={checkExam} /> }/>
-        <Route path="/update" render={() => 
+                  checkExam={checkExam} /> </>}/>
+        <Route path="/update" render={() => <>
+          <Row>
+          <AppTitle />
+          </Row>
           <ExamForm courses={fakeCourses} 
-                    addOrUpdateExam={updateExam} checkExam={checkExam}/> }/>
+                    addOrUpdateExam={updateExam} checkExam={checkExam}/> </>}/>
         <Route path='/' render={ () => 
+           <>
+           <Row>
+           <AppTitle />
+           <Col align='right'>
+             <Button variant='secondary' onClick={() => setPrivacy(p => !p)}>{privacy ? 'View' : 'Hide'}</Button>
+             <Button variant='secondary' onClick={() => setEditable(e => !e)}>{editable ? 'Read' : 'Edit'}</Button>
+           </Col>
+         </Row>           
            <Row>
              <Col>
                <PrivacyMode.Provider value={privacy}>
-                 <EditMode.Provider value={editable}>
+                 <EditMode.Provider value={editable}>                
                    <ExamTable exams={exams} courses={fakeCourses} deleteExam={deleteExam}/>
                   </EditMode.Provider>
                 </PrivacyMode.Provider>
               </Col>
-            </Row>} />
+            </Row></>} />
         </Switch>
       </Container>
     </Router>
