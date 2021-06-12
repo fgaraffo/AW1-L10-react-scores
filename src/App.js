@@ -67,7 +67,7 @@ function App() {
              <Col>
                <PrivacyMode.Provider value={privacy}>
                  <EditMode.Provider value={editable}>
-                   <ExamTable exams={fakeExams} courses={fakeCourses} deleteExam={deleteExam}/>
+                   <ExamTable exams={exams} courses={fakeCourses} deleteExam={deleteExam}/>
                   </EditMode.Provider>
                 </PrivacyMode.Provider>
               </Col>
