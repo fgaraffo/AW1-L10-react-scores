@@ -80,14 +80,15 @@ function ExamForm(props) {
         event.preventDefault();
 
         //FORM VALIDATION
-        if (course !== '' && props.checkExam(course) && score <= 31 && score >= 18) {
+        //&& props.checkExam(course) 
+        if (course !== '' && score <= 31 && score >= 18) {
             const exam = { coursecode: course, score: score, date: dayjs(date) };
             props.addOrUpdateExam(exam);
             setSubmitted(true);
             // setValidated(true);
         }
         else if (course === '') { setError('Scegliere un corso dalla lista.'); }
-        else if (!props.checkExam(course)) { setError(`Il corso ${course} è già presente.`); }
+    //  else if (!props.checkExam(course)) { setError(`Il corso ${course} è già presente.`); }
         else if (score >= 31 || score <= 18) { setError(`Voto ${score} non valido. Inserire un voto compreso tra 18 e 31.`); }
         // setValidated(true);
     };
@@ -101,7 +102,7 @@ function ExamForm(props) {
                 <Form.Group controlId='selectedCourse'>
                     <Form.Label>Course</Form.Label>
                     <Form.Control as='select' value={course} onChange={(ev) => setCourse(ev.target.value)}
-                        isValid={course !== '' && props.checkExam(course)}
+                        isValid={course !== '' /*  && props.checkExam(course)  */}
                         disabled={location.state}
                         required>
                         <option hidden disabled value=''>choose...</option>

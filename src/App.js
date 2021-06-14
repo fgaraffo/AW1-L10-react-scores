@@ -37,12 +37,14 @@ function App() {
     setExams((exs) => exs.filter((ex) => ex.coursecode !== coursecode));
   };
 
+  /* Controlla che esame non sia già presente
   const checkExam = (course) => {
     if (exams.filter( ex => ex.coursecode === course).length === 0)
         return true;
     else
         return false;
 };
+*/
 
   return (
     <Router>
@@ -53,14 +55,13 @@ function App() {
         <AppTitle />
         </Row>
          <ExamForm courses={fakeCourses.filter(course => !examCodes.includes(course.coursecode))} 
-                  addOrUpdateExam={addExam} 
-                  checkExam={checkExam} /> </>}/>
+                  addOrUpdateExam={addExam} /> </>}/>
         <Route path="/update" render={() => <>
           <Row>
           <AppTitle />
           </Row>
           <ExamForm courses={fakeCourses} 
-                    addOrUpdateExam={updateExam} checkExam={checkExam}/> </>}/>
+                    addOrUpdateExam={updateExam} /> </>}/>
         <Route path='/' render={ () => 
            <>
            <Row>
