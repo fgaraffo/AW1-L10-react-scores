@@ -23,7 +23,7 @@ function ExamTable(props) {
                     {
                         props.exams.map((ex) =>
                             <ExamRow exam={ex}
-                                examName={props.courses.filter((c) => c.coursecode === ex.coursecode)[0].name}
+                                examName={ props.courses.filter( c => c.coursecode === ex.coursecode )[0].name }
                                 deleteExam={props.deleteExam}
                                 key={ex.coursecode}>
                             </ExamRow>

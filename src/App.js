@@ -1,22 +1,41 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import './App.css';
-import { fakeCourses, fakeExams } from './FakeData';
 import AppTitle from './AppTitle';
 import { PrivacyMode, EditMode } from './createContexts';
 import { ExamTable, ExamForm } from './ExamComponents'
+import API from './API';
 
 function App() {
 
-  const [exams, setExams] = useState([...fakeExams]);
+  const [exams, setExams] = useState([]);
+  const [courses, setCourses] = useState([]);
   const [privacy, setPrivacy] = useState(false);
   const [editable, setEditable] = useState(true);
 
-  const examCodes = exams.map(exam => exam.coursecode);
+  // COURSES
+  useEffect( () => {
+    const getCourses = async () => {
+      const courses = await API.getAllCourses();
+      setCourses(courses);
+    }
+    getCourses();
+  }, []);
+
+  // EXAMS
+  useEffect( () => {
+    const getExams = async () => {
+      const exams = await API.getAllExams();
+      setExams(exams);
+    }
+    getExams();
+  }, []);
   
+  const examCodes = exams.map(exam => exam.coursecode);
+
   const addExam = (exam) => {
     setExams((oldExams) => [...oldExams, exam]);
     //setExams((oldExams) => oldExams.concat(exam));
@@ -26,7 +45,7 @@ function App() {
     setExams(oldExams => {
       return oldExams.map(ex => {
         if (ex.coursecode === exam.coursecode)
-          return {coursecode: exam.coursecode, score: exam.score, date: exam.date};
+          return { coursecode: exam.coursecode, score: exam.score, date: exam.date };
         else
           return ex;
       });
@@ -48,38 +67,38 @@ function App() {
 
   return (
     <Router>
-      <Container className='App'>       
+      <Container className='App'>
         <Switch>
-        <Route path="/add" render={() => <>
-        <Row>
-        <AppTitle />
-        </Row>
-         <ExamForm courses={fakeCourses.filter(course => !examCodes.includes(course.coursecode))} 
-                  addOrUpdateExam={addExam} /> </>}/>
-        <Route path="/update" render={() => <>
-          <Row>
-          <AppTitle />
-          </Row>
-          <ExamForm courses={fakeCourses} 
-                    addOrUpdateExam={updateExam} /> </>}/>
-        <Route path='/' render={ () => 
-           <>
-           <Row>
-           <AppTitle />
-           <Col align='right'>
-             <Button variant='secondary' onClick={() => setPrivacy(p => !p)}>{privacy ? 'View' : 'Hide'}</Button>
-             <Button variant='secondary' onClick={() => setEditable(e => !e)}>{editable ? 'Read' : 'Edit'}</Button>
-           </Col>
-         </Row>           
-           <Row>
-             <Col>
-               <PrivacyMode.Provider value={privacy}>
-                 <EditMode.Provider value={editable}>                
-                   <ExamTable exams={exams} courses={fakeCourses} deleteExam={deleteExam}/>
-                  </EditMode.Provider>
-                </PrivacyMode.Provider>
-              </Col>
-            </Row></>} />
+          <Route path="/add" render={() => <>
+            <Row>
+              <AppTitle />
+            </Row>
+            <ExamForm courses={courses.filter(course => !examCodes.includes(course.coursecode))}
+              addOrUpdateExam={addExam} /> </>} />
+          <Route path="/update" render={() => <>
+            <Row>
+              <AppTitle />
+            </Row>
+            <ExamForm courses={courses}
+              addOrUpdateExam={updateExam} /> </>} />
+          <Route path='/' render={() =>
+            <>
+              <Row>
+                <AppTitle />
+                <Col align='right'>
+                  <Button variant='secondary' onClick={() => setPrivacy(p => !p)}>{privacy ? 'View' : 'Hide'}</Button>
+                  <Button variant='secondary' onClick={() => setEditable(e => !e)}>{editable ? 'Read' : 'Edit'}</Button>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <PrivacyMode.Provider value={privacy}>
+                    <EditMode.Provider value={editable}>
+                      <ExamTable exams={exams} courses={courses} deleteExam={deleteExam} />
+                    </EditMode.Provider>
+                  </PrivacyMode.Provider>
+                </Col>
+              </Row></>} />
         </Switch>
       </Container>
     </Router>
