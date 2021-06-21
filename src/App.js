@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Row, Col, Button } from 'react-bootstrap';
+import { Container, Row, Col, Button, Alert } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
@@ -17,6 +17,7 @@ function App() {
   const [editable, setEditable] = useState(true);
   const [dirty, setDirty] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState('');
 
   // Carica i COURSES
   useEffect( () => {
@@ -24,7 +25,10 @@ function App() {
       const courses = await API.getAllCourses();
       setCourses(courses);
     }
-    getCourses();
+    getCourses().catch(err => {
+      setErrorMsg("Impossible to load your exams! Please, try again later...");
+      console.error(err);
+    });;;
   }, []);
 
   // Carica gli EXAMS
@@ -35,7 +39,10 @@ function App() {
       //setDirty(false); // ANCHE QUI VA BENE
     }
     if (courses.length && dirty)
-      getExams().then( () => { setLoading(false); setDirty(false) });
+      getExams().then( () => { setLoading(false); setDirty(false) }).catch(err => {
+        setErrorMsg("Impossible to load your exams! Please, try again later...");
+        console.error(err);
+      });
   }, [courses.length, dirty]);
   
   const examCodes = exams.map(exam => exam.coursecode);
@@ -43,7 +50,7 @@ function App() {
   const addExam = (exam) => {
     exam.status = 'added';
     setExams((oldExams) => [...oldExams, exam]);
-    API.addExam(exam).then( () => { setDirty(true) });
+    API.addExam(exam).then( () => { setDirty(true) }).catch(err => handleErrors(err) );
   };
 
   const deleteExam = (coursecode) => {
@@ -56,7 +63,7 @@ function App() {
           return ex;
       })
     })
-    API.deleteExam(coursecode).then( () => { setDirty(true) })
+    API.deleteExam(coursecode).then( () => { setDirty(true) }).catch(err => handleErrors(err) );
   };
 
   const updateExam = (exam) => {
@@ -68,8 +75,17 @@ function App() {
           return ex;
       });
     });
-    API.updateExam(exam).then( () => { setDirty(true) });
+    API.updateExam(exam).then( () => { setDirty(true) }).catch(err => handleErrors(err) );
 
+  }
+
+  const handleErrors = (err) => {
+    if(err.errors) // ??
+      setErrorMsg(err.errors[0].msg + ': ' + err.errors[0].param);
+    else
+      setErrorMsg(err.error);
+
+    setDirty(true);
   }
 
   /* Controlla che esame non sia già presente
@@ -106,9 +122,12 @@ return (
                 <Button variant='secondary' onClick={() => setEditable(e => !e)}>{editable ? 'Read' : 'Edit'}</Button>
               </Col>
             </Row>
-
-            { loading ? <span> 🕗 Please wait, loading your exams... 🕗 </span> : 
             <Row>
+               {errorMsg && <Alert variant='danger' onClose={() => setErrorMsg('')} dismissible>{errorMsg}</Alert>}
+           </Row>  
+           { loading ? <Row><span> 🕗 Please wait, loading your exams... 🕗 </span></Row> :           
+            <Row>
+             
               <Col>
                 <PrivacyMode.Provider value={privacy}>
                   <EditMode.Provider value={editable}>
