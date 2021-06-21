@@ -36,8 +36,25 @@ function ExamTable(props) {
 };
 
 function ExamRow(props) {
+
+    let statusClass = null;
+
+    switch (props.exam.status) {
+        case 'added':
+            statusClass = 'table-success';
+            break;
+        case 'deleted':
+            statusClass = 'table-danger';
+            break;
+        case 'updated':
+            statusClass = 'table-warning';
+            break;
+        default:
+            break;
+    }
+
     return (
-        <tr>
+        <tr className={statusClass}>
             <ExamRowData examName={props.examName} exam={props.exam} />
             {/* ---------- CONTEXT PRIMO METODO, Consumer + callback ---------- */}
             <EditMode.Consumer>{editable => editable ?
