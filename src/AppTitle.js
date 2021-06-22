@@ -1,10 +1,15 @@
-import { Col } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
+import { LogoutButton } from './LoginComponents';
 
-function AppTitle() {
+function AppTitle(props) {
+
   return (
-    <Col>
-      <h1>Your Exams</h1>
-    </Col>
+    <Row>
+      <Col>
+        <h1>Your Exams</h1>
+      </Col>      
+     {props.loggedIn ? <LogoutButton logout={props.logout}/> : <></>}      
+    </Row>
   );
 }
 
